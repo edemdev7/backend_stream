@@ -29,12 +29,14 @@ app.get('/stream/status', (req, res) => {
 // WebRTC signaling
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
+  socket.emit('stream_status', isStreamActive);
 
   socket.on('start_stream', () => {
     if (!isStreamActive) {
       isStreamActive = true;
       broadcasterId = socket.id;
       io.emit('stream_started');
+      socket.broadcast.emit('stream_started');
       console.log('Stream started by:', socket.id);
     }
   });
@@ -44,6 +46,7 @@ io.on('connection', (socket) => {
       isStreamActive = false;
       broadcasterId = null;
       io.emit('stream_stopped');
+      socket.broadcast.emit('stream_stopped');
       console.log('Stream stopped by:', socket.id);
     }
   });
