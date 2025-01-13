@@ -18,15 +18,13 @@ const io = new Server(server, {
 app.use(cors());
 app.use(express.json());
 
-let isStreamActive = false; // Track stream status
-let broadcasterId = null; // Store the broadcaster's socket ID
+let isStreamActive = false; 
+let broadcasterId = null; 
 
-// Route for stream status
 app.get('/stream/status', (req, res) => {
   res.send({ isStreamActive });
 });
 
-// WebRTC signaling
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
   socket.emit('stream_status', isStreamActive);
@@ -36,8 +34,6 @@ io.on('connection', (socket) => {
       isStreamActive = true;
       broadcasterId = socket.id;
       io.emit('stream_started');
-      socket.broadcast.emit('stream_started');
-      console.log('Stream started by:', socket.id);
     }
   });
 
@@ -46,8 +42,6 @@ io.on('connection', (socket) => {
       isStreamActive = false;
       broadcasterId = null;
       io.emit('stream_stopped');
-      socket.broadcast.emit('stream_stopped');
-      console.log('Stream stopped by:', socket.id);
     }
   });
 
@@ -70,7 +64,6 @@ io.on('connection', (socket) => {
       isStreamActive = false;
       io.emit('stream_stopped');
     }
-    console.log('User disconnected:', socket.id);
   });
 });
 
